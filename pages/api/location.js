@@ -1,6 +1,6 @@
 import { loadFirebase } from '../../lib/db.js'
 import getRawBody from 'raw-body'
-
+const geofire= require('geofire-common');
 //let firebase = await loadFirebase();
 //let db = firebase.firestore().collection('users')
 
@@ -44,10 +44,13 @@ async function location(req, res) {
 
 
             const body = req.body
+            const latitude = body.latitude;
+            const longitude = body.longitude
             const location = {
                 userID: body.userID,
                 latitude: body.latitude,
                 longitude: body.longitude,
+                hash : geofire.geohashForLocation([latitude,longitude]),
                 dataHora: body.dataHora
             }
 
