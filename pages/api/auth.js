@@ -9,7 +9,7 @@ async function location(req, res) {
             const login = req.body.login;
             const password = req.body.password;
             const result = await existe(login, password);
-            console.log("res: ", await result)
+            console.log("res: ", result)
             res.status(200).json(result);
         } else {
             res.status(500).json({"date": new Date(),'message': 'metodo não aceito'})
@@ -39,8 +39,7 @@ async function existe(login,password){
     }
 
     
-    return id
-
+    return {"id":id}
 }
 
 export default location;
