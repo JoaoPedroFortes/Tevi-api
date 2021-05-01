@@ -7,11 +7,11 @@ async function dadosContato(req, res) {
             console.log(userId)
             const result = await getUserDadosContato(userId);
 
-           
+
 
             console.log("res: ", result)
             res.status(200).json(result);
-            
+
 
 
         } catch (error) {
@@ -29,8 +29,8 @@ async function dadosContato(req, res) {
 async function getUserDadosContato(userId) {
     let dados = []
     let firebase = loadFirebase();
-    console.log('user: '+ userId)
-    const dadosContatoRef =  firebase.firestore().collection('dadosContato');
+    console.log('user: ' + userId)
+    const dadosContatoRef = firebase.firestore().collection('dadosContato');
     const query = await dadosContatoRef.where("userId", "==", userId).get();
 
     if (query.empty) {
@@ -42,7 +42,7 @@ async function getUserDadosContato(userId) {
         dados.push(doc.data())
     })
 
-    console.log('dados:'+ dados)
+    console.log('dados:' + dados)
     return dados
 }
 export default dadosContato;

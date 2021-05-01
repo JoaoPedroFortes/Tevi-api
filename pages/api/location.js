@@ -13,18 +13,16 @@ async function getInitialProps() {
             .limit(10)
             .get()
             .then(snapshot => {
-                //console.log(snapshot)
+
 
                 snapshot.forEach(doc => {
                     data.push(Object.assign({
                         id: doc.id
                     }, doc.data()))
                 })
-                console.log('entrei aqui')
-                //  console.log(data)
+
                 resolve(data)
-                console.log('vou retornar')
-                console.log(data)
+
 
             }).catch(error => {
                 reject([])
@@ -50,14 +48,14 @@ async function location(req, res) {
             const dataTimestamp = new Date(body.dataHora)
 
             const dataHora = new firebase.firestore.Timestamp.fromDate(dataTimestamp)
-            console.log('hora convertida', dataHora)
+
 
             const location = {
                 userID: body.userId,
                 dataHora: dataHora,
                 point: point,
                 geohash: geofire.geohashForLocation([point._lat, point._long]),
-                
+
             }
 
 
