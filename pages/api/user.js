@@ -49,7 +49,7 @@ async function user(req, res) {
             const birthdate = new Date(user.birthdate.seconds *1000 )
 
             const userData = {
-                login, password, name, birthdate
+                login, name, birthdate
             }
 
             usersOnDb.push(userData);
