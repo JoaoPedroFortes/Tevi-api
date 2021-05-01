@@ -1,6 +1,6 @@
 import { loadFirebase } from '../../lib/db.js'
 import getRawBody from 'raw-body'
-const geofire= require('geofire-common');
+const geofire = require('geofire-common');
 //let firebase = await loadFirebase();
 //let db = firebase.firestore().collection('users')
 
@@ -20,7 +20,7 @@ async function getInitialProps() {
                         id: doc.id
                     }, doc.data()))
                 })
-                 console.log('entrei aqui')
+                console.log('entrei aqui')
                 //  console.log(data)
                 resolve(data)
                 console.log('vou retornar')
@@ -30,7 +30,7 @@ async function getInitialProps() {
                 reject([])
             })
     }).catch(error => {
-       console.log(error)
+        console.log(error)
     })
     console.log('ta safe')
     return data
@@ -46,12 +46,18 @@ async function location(req, res) {
             const body = req.body
             const latitude = body.latitude;
             const longitude = body.longitude
+            const point = new firebase.firestore.GeoPoint(latitude, longitude)
+            const dataTimestamp = new Date(body.dataHora)
+
+            const dataHora = new firebase.firestore.Timestamp.fromDate(dataTimestamp)
+            console.log('hora convertida', dataHora)
+
             const location = {
-                userID: body.userID,
-                latitude: body.latitude,
-                longitude: body.longitude,
-                hash : geofire.geohashForLocation([latitude,longitude]),
-                dataHora: body.dataHora
+                userID: body.userId,
+                dataHora: dataHora,
+                point: point,
+                geohash: geofire.geohashForLocation([point._lat, point._long]),
+                
             }
 
 
@@ -60,8 +66,11 @@ async function location(req, res) {
             console.log(location)
             updates = location;
             res.setHeader('Content-Type', 'Application/Json');
-            res.status(200).json(body)
-            return firebase.firestore().collection('location').add(updates);
+
+            const upload = await firebase.firestore().collection('location').add(updates);
+
+            return res.status(200).json(upload)
+
 
 
         } catch (error) {

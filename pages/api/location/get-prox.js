@@ -58,18 +58,15 @@ async function getUsersLocation(userId, dataHora) {
     let latitude = '';
     let longitude = '';
     query.forEach((doc) => {
-        console.log("query: ", doc.data())
         latitude = doc.data().point._lat;
         longitude = doc.data().point._long;
     })
 
 
-    console.log('lat: ', latitude);
-    console.log('long:', longitude);
-    console.log('userId: ', userId);
-    const next = await getNextUsers(userId, dataHora, latitude, longitude);
+    let next = [];
+    next = await getNextUsers(userId, dataHora, latitude, longitude);
 
-    console.log('next: ', next)
+
 
 
     return next
@@ -77,6 +74,8 @@ async function getUsersLocation(userId, dataHora) {
 
 async function getNextUsers(userId, dataHora, latitude, longitude) {
     let firebase = loadFirebase();
+
+    let matchingDocs = [];
 
     const userPoint = [latitude, longitude];
     const radiusInM = 70;
@@ -90,22 +89,22 @@ async function getNextUsers(userId, dataHora, latitude, longitude) {
         let locationRef = await firebase.firestore().collection('location')
         let q = await locationRef.orderBy('geohash').startAt(b[0]).endAt(b[1]).get();
 
-        promises.push(await q);
+        promises.push(q);
 
     }
 
 
 
 
-    Promise.all(promises).then((snapshots) => {
-        let matchingDocs = [];
+    const match = await Promise.all(promises).then((snapshots) => {
+
 
         for (const snap of snapshots) {
             for (const doc of snap.docs) {
-                let dataDoc =doc.get('dataHora').toDate().toLocaleString();
-                let data = new Date(dataHora).toLocaleString()
-               
-                if (dataDoc === data) {
+                let dataDoc = new Date(doc.get('dataHora').toDate());
+                let data = new Date(dataHora)
+
+                if (dataDoc.getUTCMonth() === data.getUTCMonth() && dataDoc.getDate() === dataDoc.getDate()) {
                     const lat = doc.get('point')._lat;
                     const lng = doc.get('point')._long;
 
@@ -123,37 +122,15 @@ async function getNextUsers(userId, dataHora, latitude, longitude) {
 
         }
 
-
-        for (const doc of matchingDocs) {
-            console.log("docs:", doc)
-        }
-
-
-
-        return matchingDocs;
-
+        return matchingDocs
 
     })
+
+
+    return match
+
+
 }
 
 export default location;
 
-/*
- .then(snapshot => {
-                //console.log(snapshot)
-
-                snapshot.forEach(doc => {
-                    data.push(Object.assign({
-                        id: doc.id
-                    }, doc.data()))
-                })
-                // console.log('entrei aqui')
-                //  console.log(data)
-                resolve(data)
-                console.log('vou retornar')
-                console.log(data)
-
-            }
-
-
-*/
