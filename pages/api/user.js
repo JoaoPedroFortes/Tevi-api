@@ -21,8 +21,7 @@ async function getInitialProps() {
                 // console.log('entrei aqui')
                 //  console.log(data)
                 resolve(data)
-                console.log('vou retornar')
-                console.log(data)
+               
 
             }).catch(error => {
                 reject([])
@@ -30,7 +29,7 @@ async function getInitialProps() {
     }).catch(error => {
         throw new Error(error);
     })
-    console.log('ta safe')
+ 
     return data
 
 }
@@ -46,7 +45,6 @@ async function user(req, res) {
         for (let i = 0; i < result.length; i++) {
             let user = result[i];
             const login = user.login;
-            const password = user.password;
             const name = user.name;
             const birthdate = new Date(user.birthdate.seconds *1000 )
 
