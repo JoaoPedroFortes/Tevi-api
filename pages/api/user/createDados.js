@@ -6,6 +6,7 @@ async function dadosContato(req, res) {
             const body = req.body
             const contatos = {
                 "userId": body.userId,
+                "name": body.name,
                 "celular": body.celular,
                 "userId": body.userId,
                 "linkedin": body.linkedin,
