@@ -13,7 +13,7 @@ async function location(req, res) {
 
             // generateHash('9aP4rvKR2LSIArFRW4cd');
             const result = await (getUsersLocation(userID, dataHora));
-            console.log("res: ", await result)
+
             res.status(200).json(result);
         } else {
             res.status(500).json(new Date().getDate())
@@ -50,7 +50,7 @@ async function getUsersLocation(userId, dataHora) {
     const query = await locationRef.where("userID", "==", userId).where("dataHora", "==", dataHoraDate).get();
 
     if (query.empty) {
-        console.log("nenhum encontrado");
+
         return;
     }
 
@@ -66,11 +66,64 @@ async function getUsersLocation(userId, dataHora) {
     let next = [];
     next = await getNextUsers(userId, dataHora, latitude, longitude);
 
+    let matches = []
 
+    matches = createObj(userId, next)
 
-
-    return next
+    console.log('lalala', + matches)
+    return matches
 }
+
+let createObj = async (userId, next) => {
+
+    const userMatches = []
+
+    const arrId = []
+    for (let c of next) {
+        if (c.userID === userId) continue
+        if (arrId.length && arrId.find(el => el === c.userID)) continue
+
+
+        let id = c.userID
+
+        arrId.push(id)
+        console.log(c.avatar)
+        let name = await getUserName(id);
+
+        let obj = Object.assign({ id: id }, name)
+
+        userMatches.push(obj)
+    }
+
+    let matches = await Promise.all(userMatches).then((response) => {
+        return response
+    })
+
+    return matches
+}
+
+let getUserName = async (userId) => {
+
+    let firebase = loadFirebase();
+
+    let storage = firebase.storage();
+
+
+    const userRef = firebase.firestore().collection('users');
+    const query = await userRef.doc(userId).get();
+
+    if (query.empty) {
+
+        return [];
+    }
+
+    let obj = {
+        name: query.data().name,
+        avatar: query.data().avatar
+    }
+    return obj
+}
+
 
 async function getNextUsers(userId, dataHora, latitude, longitude) {
     let firebase = loadFirebase();
@@ -108,8 +161,7 @@ async function getNextUsers(userId, dataHora, latitude, longitude) {
                     const lat = doc.get('point')._lat;
                     const lng = doc.get('point')._long;
 
-                    console.log("lat: " + lat);
-                    console.log("lng: " + lng);
+
 
                     const distanceInKm = geofire.distanceBetween([lat, lng], userPoint)
                     const distanceInM = distanceInKm * 1000;
